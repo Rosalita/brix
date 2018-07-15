@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -35,10 +36,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func showResult(w http.ResponseWriter, r *http.Request) {
+
 	r.ParseForm()
+	input := marshalFormValues(r.Form)
+	fmt.Printf("%+v", input)
+}
+
+func marshalFormValues(values url.Values) Userinput {
 	var input Userinput
-	for i, value := range r.Form {
-		switch i {
+	for key, value := range values {
+		switch key {
 		case "length":
 			input.Length = handleFloatParsingErrors(value[0])
 		case "width":
@@ -51,6 +58,7 @@ func showResult(w http.ResponseWriter, r *http.Request) {
 			input.Dimension = handleFloatParsingErrors(value[0])
 		}
 	}
+	return input
 }
 
 func handleFloatParsingErrors(value string) float64 {
