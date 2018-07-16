@@ -2,6 +2,7 @@ package main
 
 import (
 	"testing"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,7 +23,7 @@ func TestCalcWholeBricksInDim(t *testing.T) {
 	}
 }
 
-func TestCalcCoordinatedSize(t *testing.T) {
+func TestCalcCoSize(t *testing.T) {
 	var tests = []struct {
 		length float64
 		joint  float64
@@ -33,7 +34,7 @@ func TestCalcCoordinatedSize(t *testing.T) {
 		{102.5, 10, 112.5},
 	}
 	for _, test := range tests {
-		coordinatedSize := calcCoordinatedSize(test.length, test.joint)
+		coordinatedSize := calcCoSize(test.length, test.joint)
 		assert.Equal(t, test.coSize, coordinatedSize, "unexpected coordinated size calculatedfor length: %.2f joint: %.2f", test.length, test.joint)
 	}
 }
@@ -47,6 +48,7 @@ func TestCalcRemainderFromDim(t *testing.T) {
 		{450, 225, 0},
 		{451, 225, 1},
 		{449, 225, 224},
+		{215, 225, 215},
 	}
 	for _, test := range tests {
 		remainder := calcRemainderFromDim(test.dimension, test.coordinatedSize)
@@ -124,17 +126,76 @@ func TestCanCalcCoPlusAndMinus(t *testing.T) {
 	}
 }
 
-func TestCanCheckRemainder(t *testing.T) {
+func TestCanCalcResult(t *testing.T) {
+
+	var tests = []struct {
+		remainder           float64
+		wholeBricks         int
+		coSizeForHalfBrick  float64
+		coSizeForWholeBrick float64
+		result              result
+	}{
+		{25, 15, 112.5, 225, result{fullCo: 3375,halfCo: 3487.5}},
+		{215, 0, 112.5, 225, result{fullCo: 0, halfCo: 112.5}},
+	}
+	for _, test := range tests {
+		result := calcResult(test.remainder, test.wholeBricks, test.coSizeForHalfBrick, test.coSizeForWholeBrick)
+		assert.Equal(t, test.result, result, "dimension %.2f has unexpected properties")
+	}
+}
+
+func TestIsAFullCo(t *testing.T){
 	var tests = []struct {
 		remainder  float64
 		wholeBricks   int
-		coSizeForHalfBrick float64
-		dimProps DimensionProperties
+		isAFullCo  bool
 	}{
-		{25, 15, 112.5, DimensionProperties{isAFullCo: false, isAHalfCo: false, isLessThanHalfACo: true}},
+		{25, 15, false},
+		{0, 15, true},
+		{0, 1, true},
+		{0, 0, false},
 	}
 	for _, test := range tests {
-		dimProps := checkRemainder(test.remainder, test.wholeBricks, test.coSizeForHalfBrick)
-		assert.Equal(t, test.dimProps, dimProps, "dimension %.2f has unexpected properties")
+		result := isAFullCo(test.remainder, test.wholeBricks)
+		assert.Equal(t, test.isAFullCo, result, "unexpected isAFullCo property for remainder: %.2f wholeBricks: %d", test.remainder, test.wholeBricks)
+	}
+	
+}
+
+func TestIsAHalfCo(t *testing.T){
+	var tests = []struct {
+		remainder  float64
+		coSizeForHalfBrick float64
+		isAHalfCo  bool
+	}{
+		{25, 112.5, false},
+		{115, 112.5, false},
+		{112.5, 112.5, true},
+	}
+	for _, test := range tests {
+		result := isAHalfCo(test.remainder, test.coSizeForHalfBrick)
+		assert.Equal(t, test.isAHalfCo, result, "unexpected isAHalfCo property for remainder: %.2f coSizeHalfBrick: %.2f", test.remainder, test.coSizeForHalfBrick)
+	}
+}
+
+func TestIsLessThanHalfACo(t *testing.T){
+	var tests = []struct {
+		wholeBricks int
+		remainder  float64
+		coSizeForHalfBrick float64
+		isLessThanHalfACo  bool
+	}{
+		{15, 25, 112.5, true},
+		{1, 99, 100, true},
+		{15, 1, 112.5, true},
+		{15, 200, 112.5, false},
+		{1, 100, 100, false},
+		{1, 101, 100, false},
+		{1, 0, 112.5, false},
+
+	}
+	for _, test := range tests {
+		result := isLessThanHalfACo(test.wholeBricks, test.remainder,  test.coSizeForHalfBrick)
+		assert.Equal(t, test.isLessThanHalfACo, result, "unexpected isLessThanHalfACo property for remainder: %.2f wholebricks: %d coSizeHalfBrick: %.2f", test.remainder, test.wholeBricks, test.coSizeForHalfBrick)
 	}
 }

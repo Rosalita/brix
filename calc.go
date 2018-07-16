@@ -1,7 +1,6 @@
 package main
 
 import (
-	//"fmt"
 	"math"
 )
 
@@ -11,22 +10,21 @@ type Cos struct {
 	coMinus float64
 }
 
-type DimensionProperties struct {
-	isAFullCo         bool
-	isAHalfCo         bool
-	isLessThanHalfACo bool
+type result struct {
+	fullCo float64
+	halfCo float64
 }
 
-func calcWholeBricksInDim(dimension float64, coordinatedSize float64) int {
-	return int(dimension / coordinatedSize)
+func calcWholeBricksInDim(dimension float64, coSize float64) int {
+	return int(dimension / coSize)
 }
 
-func calcCoordinatedSize(length float64, joint float64) float64 {
+func calcCoSize(length float64, joint float64) float64 {
 	return length + joint
 }
 
-func calcRemainderFromDim(dimension float64, coordinatedSize float64) float64 {
-	return math.Mod(dimension, coordinatedSize)
+func calcRemainderFromDim(dimension float64, coSize float64) float64 {
+	return math.Mod(dimension, coSize)
 }
 
 func calcWholeCo(wholeBricks int, coordinatedSize float64) float64 {
@@ -50,27 +48,42 @@ func calcCoPlusAndMinus(co float64, joint float64) Cos {
 	return cos
 }
 
-func checkRemainder(remainder float64, wholeBricks int, coSizeForHalfBrick float64) DimensionProperties{
-	dimProps := DimensionProperties{}
-	if remainder == 0 && wholeBricks != 0 {
-		dimProps.isAFullCo = true
-		dimProps.isAHalfCo = false
-	} else {
-		dimProps.isAFullCo = false
-	}
+func isAFullCo(remainder float64, wholeBricks int) bool {
+	return remainder == 0 && wholeBricks != 0
+}
 
-	if remainder == coSizeForHalfBrick {
-		dimProps.isAHalfCo = true
-		dimProps.isAFullCo = false
-	} else {
-		dimProps.isAHalfCo = false
-	}
+func isAHalfCo(remainder float64, coSizeForHalfBrick float64) bool {
+	return remainder == coSizeForHalfBrick
+}
 
-	if remainder >= 0 && !dimProps.isAFullCo && remainder < coSizeForHalfBrick {
-		dimProps.isLessThanHalfACo = true
-	} else {
-		dimProps.isLessThanHalfACo = false
-	}
+func isLessThanHalfACo(wholeBricks int, remainder float64, coSizeForHalfBrick float64) bool {
+	return remainder >= 0 && !isAFullCo(remainder, wholeBricks) && remainder < coSizeForHalfBrick
+}
 
-	return dimProps
+func calcResult(remainder float64, wholeBricks int, coSizeForHalfBrick float64, coSizeForFullBrick float64) result {
+	result := result{}
+	if isAFullCo(remainder, wholeBricks) {
+		result.fullCo = calcWholeCo(wholeBricks, coSizeForFullBrick)
+	}
+	if isAHalfCo(remainder, coSizeForHalfBrick) {
+		result.halfCo = calcHalfCo(wholeBricks, coSizeForFullBrick, coSizeForHalfBrick)
+	}
+	if wholeBricks == 0 {
+		if isLessThanHalfACo(wholeBricks, remainder, coSizeForHalfBrick) {
+			result.fullCo = float64(0)
+			result.halfCo = calcHalfCo(wholeBricks, coSizeForFullBrick, coSizeForHalfBrick)
+		} else {
+			result.fullCo = calcWholeCo(wholeBricks, coSizeForFullBrick)
+			result.halfCo = calcHalfCo(wholeBricks, coSizeForFullBrick, coSizeForHalfBrick)
+		}
+	} else {
+		if isLessThanHalfACo(wholeBricks, remainder, coSizeForHalfBrick) {
+			result.fullCo = calcWholeCo(wholeBricks, coSizeForFullBrick)
+			result.halfCo = calcHalfCo(wholeBricks, coSizeForFullBrick, coSizeForHalfBrick)
+		} else {
+			result.fullCo = calcWholeCo(wholeBricks+1, coSizeForFullBrick)
+			result.halfCo = calcHalfCo(wholeBricks, coSizeForFullBrick, coSizeForHalfBrick)
+		}
+	}
+	return result
 }

@@ -20,8 +20,6 @@ type Userinput struct {
 	Joint     float64
 }
 
-
-
 func main() {
 
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css"))))
@@ -41,22 +39,14 @@ func handleResult(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
 	input := marshalFormValues(r.Form)
-	coordinatedSize := calcCoordinatedSize(input.Length, input.Joint)
-	wholeBricks := calcWholeBricksInDim(coordinatedSize, input.Dimension)
-	remainder := calcRemainderFromDim(coordinatedSize, input.Dimension)
+	coSizeForFullBrick := calcCoSize(input.Length, input.Joint)
+	halfBrickOnly := calcHalfBrickSize(input.Length, input.Joint)
+	coSizeForHalfBrick := calcCoSize(halfBrickOnly, input.Joint)
+	wholeBricks := calcWholeBricksInDim(input.Dimension, coSizeForFullBrick)
+	remainder := calcRemainderFromDim(input.Dimension, coSizeForFullBrick)
 
-	//if wholeBricks == 0 {
-   //checkRemainderForZeroBricks()
-	//}
-
-	// if wholeBricks > 0{
-	// 	checkRemainder()
-  // }
-
-
-	fmt.Println(wholeBricks)
-	fmt.Println(remainder)
-	fmt.Printf("%+v", input)
+	result := calcResult(remainder, wholeBricks, coSizeForHalfBrick, coSizeForFullBrick)
+	fmt.Printf("%+v\n", result)
 }
 
 func marshalFormValues(values url.Values) Userinput {
