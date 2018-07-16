@@ -20,12 +20,14 @@ type Userinput struct {
 	Joint     float64
 }
 
+
+
 func main() {
 
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css"))))
 
 	http.HandleFunc("/", handler)
-	http.HandleFunc("/result", showResult)
+	http.HandleFunc("/result", handleResult)
 	fmt.Println("listening and serving requests..")
 	http.ListenAndServe(getPort(), nil)
 }
@@ -35,10 +37,25 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	renderPage(w, "brix.html", pageVariables)
 }
 
-func showResult(w http.ResponseWriter, r *http.Request) {
+func handleResult(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
 	input := marshalFormValues(r.Form)
+	coordinatedSize := calcCoordinatedSize(input.Length, input.Joint)
+	wholeBricks := calcWholeBricksInDim(coordinatedSize, input.Dimension)
+	remainder := calcRemainderFromDim(coordinatedSize, input.Dimension)
+
+	//if wholeBricks == 0 {
+   //checkRemainderForZeroBricks()
+	//}
+
+	// if wholeBricks > 0{
+	// 	checkRemainder()
+  // }
+
+
+	fmt.Println(wholeBricks)
+	fmt.Println(remainder)
 	fmt.Printf("%+v", input)
 }
 
