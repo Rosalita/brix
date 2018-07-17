@@ -93,7 +93,7 @@ func handleResult(w http.ResponseWriter, r *http.Request) {
 		Nhalf:       result.nhalf,
 		HalfCo:      halfCos.co,
 		HalfCoPlus:  halfCos.coPlus,
-		HalfCoMinus: halfCos.coPlus,
+		HalfCoMinus: halfCos.coMinus,
 	}
 
 	renderPage(w, "brix.html", pageVariables)
