@@ -8,10 +8,6 @@ import (
 	"strconv"
 )
 
-type pageVariables struct {
-	PageTitle string
-}
-
 type Userinput struct {
 	Dimension float64
 	Length    float64
@@ -20,10 +16,36 @@ type Userinput struct {
 	Joint     float64
 }
 
+type Cos struct {
+	co      float64
+	coPlus  float64
+	coMinus float64
+}
+
+type result struct {
+	fullCo float64
+	halfCo float64
+}
+
+type pageVariables struct {
+	PageTitle   string
+	Dimension   float64
+	Length      float64
+	Width       float64
+	Height      float64
+	Joint       float64
+	WholeBricks int
+	Remainder   float64
+	fullCo      float64
+	fullCoPlus  float64
+	fullCoMinus float64
+	halfCo      float64
+	halfCoPlus  float64
+	halfCoMinus float64
+}
+
 func main() {
-
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css"))))
-
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/result", handleResult)
 	fmt.Println("listening and serving requests..")
@@ -40,13 +62,32 @@ func handleResult(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	input := marshalFormValues(r.Form)
 	coSizeForFullBrick := calcCoSize(input.Length, input.Joint)
-	halfBrickOnly := calcHalfBrickSize(input.Length, input.Joint)
-	coSizeForHalfBrick := calcCoSize(halfBrickOnly, input.Joint)
+	coSizeForHalfBrick := calcCoSize(calcHalfBrickSize(input.Length, input.Joint), input.Joint)
 	wholeBricks := calcWholeBricksInDim(input.Dimension, coSizeForFullBrick)
 	remainder := calcRemainderFromDim(input.Dimension, coSizeForFullBrick)
 
 	result := calcResult(remainder, wholeBricks, coSizeForHalfBrick, coSizeForFullBrick)
-	fmt.Printf("%+v\n", result)
+
+	fullCos := calcCoPlusAndMinus(result.fullCo, input.Joint)
+	halfCos := calcCoPlusAndMinus(result.halfCo, input.Joint)
+
+	pageVariables := pageVariables{
+		PageTitle:   "Rosibrix v2.0",
+		Dimension:   input.Dimension,
+		Length:      input.Length,
+		Width:       input.Width,
+		Height:      input.Height,
+		Joint:       input.Joint,
+		WholeBricks: wholeBricks,
+		Remainder:   remainder,
+		fullCo:      fullCos.co,
+		fullCoPlus:  fullCos.coPlus,
+		fullCoMinus: fullCos.coMinus,
+		halfCo:      halfCos.co,
+		halfCoPlus:  halfCos.coPlus,
+		halfCoMinus: halfCos.coPlus,
+	}
+	fmt.Printf("%+v\n", pageVariables)
 }
 
 func marshalFormValues(values url.Values) Userinput {

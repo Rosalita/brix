@@ -4,16 +4,7 @@ import (
 	"math"
 )
 
-type Cos struct {
-	co      float64
-	coPlus  float64
-	coMinus float64
-}
 
-type result struct {
-	fullCo float64
-	halfCo float64
-}
 
 func calcWholeBricksInDim(dimension float64, coSize float64) int {
 	return int(dimension / coSize)
