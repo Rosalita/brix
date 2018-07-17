@@ -134,13 +134,17 @@ func TestCanCalcResult(t *testing.T) {
 		coSizeForHalfBrick  float64
 		coSizeForWholeBrick float64
 		result              result
+	
 	}{
-		{25, 15, 112.5, 225, result{fullCo: 3375,halfCo: 3487.5}},
-		{215, 0, 112.5, 225, result{fullCo: 0, halfCo: 112.5}},
+		{25, 15, 112.5, 225, result{fullCo: 3375,halfCo: 3487.5, nfull: 15, nhalf: 15.5}},
+		{215, 0, 112.5, 225, result{fullCo: 0, halfCo: 112.5, nfull: 0, nhalf: 0.5}},
+		{0, 1, 112.5, 225, result{fullCo: 450, halfCo: 337.5, nfull: 2, nhalf: 1.5}},
+		{112.5, 1, 112.5, 225, result{fullCo: 450, halfCo: 337.5, nfull :2, nhalf: 1.5}},
+		{25, 0, 112.5, 225, result{fullCo: 0, halfCo: 112.5, nfull: 0, nhalf: 0.5}},
 	}
 	for _, test := range tests {
 		result := calcResult(test.remainder, test.wholeBricks, test.coSizeForHalfBrick, test.coSizeForWholeBrick)
-		assert.Equal(t, test.result, result, "dimension %.2f has unexpected properties")
+		assert.Equal(t, test.result, result, "unexpected result for remainder: %.2f wholeBricks: %d", test.remainder, test.wholeBricks )
 	}
 }
 

@@ -23,7 +23,9 @@ type Cos struct {
 }
 
 type result struct {
+	nfull int
 	fullCo float64
+	nhalf float64
 	halfCo float64
 }
 
@@ -34,14 +36,17 @@ type pageVariables struct {
 	Width       float64
 	Height      float64
 	Joint       float64
+	Result			bool
 	WholeBricks int
 	Remainder   float64
-	fullCo      float64
-	fullCoPlus  float64
-	fullCoMinus float64
-	halfCo      float64
-	halfCoPlus  float64
-	halfCoMinus float64
+	Nfull       int
+	FullCo      float64
+	FullCoPlus  float64
+	FullCoMinus float64
+	Nhalf       float64
+	HalfCo      float64
+	HalfCoPlus  float64
+	HalfCoMinus float64
 }
 
 func main() {
@@ -78,16 +83,20 @@ func handleResult(w http.ResponseWriter, r *http.Request) {
 		Width:       input.Width,
 		Height:      input.Height,
 		Joint:       input.Joint,
+		Result:      true,
 		WholeBricks: wholeBricks,
 		Remainder:   remainder,
-		fullCo:      fullCos.co,
-		fullCoPlus:  fullCos.coPlus,
-		fullCoMinus: fullCos.coMinus,
-		halfCo:      halfCos.co,
-		halfCoPlus:  halfCos.coPlus,
-		halfCoMinus: halfCos.coPlus,
+		Nfull:        result.nfull,
+		FullCo:      fullCos.co,
+		FullCoPlus:  fullCos.coPlus,
+		FullCoMinus: fullCos.coMinus,
+		Nhalf:       result.nhalf,
+		HalfCo:      halfCos.co,
+		HalfCoPlus:  halfCos.coPlus,
+		HalfCoMinus: halfCos.coPlus,
 	}
-	fmt.Printf("%+v\n", pageVariables)
+
+	renderPage(w, "brix.html", pageVariables)
 }
 
 func marshalFormValues(values url.Values) Userinput {
