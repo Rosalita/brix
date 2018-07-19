@@ -203,3 +203,21 @@ func TestIsLessThanHalfACo(t *testing.T){
 		assert.Equal(t, test.isLessThanHalfACo, result, "unexpected isLessThanHalfACo property for remainder: %.2f wholebricks: %d coSizeHalfBrick: %.2f", test.remainder, test.wholeBricks, test.coSizeForHalfBrick)
 	}
 }
+
+func TestCalcVerticalResult(t *testing.T){
+	var tests = []struct {
+		remainder  float64
+		courses int
+		verticalCoSize float64
+		result  verticalResult
+	}{
+		{25, 1, 75, verticalResult{nfirst: 1, firstCo: 75, nsecond: 2, secondCo: 150}},
+		{25, 0, 75, verticalResult{nfirst: 0, firstCo: 0, nsecond: 1, secondCo: 75}},
+		{0, 1, 75, verticalResult{nfirst: 1, firstCo: 75, nsecond: 0, secondCo: 0}},
+		{0, 0, 75, verticalResult{nfirst: 0, firstCo: 0, nsecond: 1, secondCo: 75}},
+	}
+	for _, test := range tests {
+		result := calcVerticalResult(test.remainder, test.courses, test.verticalCoSize)
+		assert.Equal(t, test.result, result, "unexpected result for remainder: %.2f courses: %d", test.remainder, test.courses)
+	}
+}

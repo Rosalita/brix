@@ -29,6 +29,13 @@ type result struct {
 	halfCo float64
 }
 
+type verticalResult struct {
+	nfirst  int
+	firstCo float64
+	nsecond int
+	secondCo float64
+}
+
 type pageVariables struct {
 	PageTitle   string
 	Dimension   float64
@@ -47,10 +54,22 @@ type pageVariables struct {
 	HalfCo      float64
 	HalfCoPlus  float64
 	HalfCoMinus float64
+	VerticalResult bool
+	Courses     int
+	CoursesRemainder float64
+	NfirstVertical  int
+	NsecondVertical int
+	FirstVCo    float64
+	FirstVCoPlus float64
+	FirstVCoMinus float64
+	SecondVCo   float64
+	SecondVCoPlus float64
+	SecondVCoMinus float64
 }
 
 func main() {
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css"))))
+	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("img"))))
 	http.HandleFunc("/", handler)
 	http.HandleFunc("/result", handleResult)
 	fmt.Println("listening and serving requests..")
@@ -70,11 +89,19 @@ func handleResult(w http.ResponseWriter, r *http.Request) {
 	coSizeForHalfBrick := calcCoSize(calcHalfBrickSize(input.Length, input.Joint), input.Joint)
 	wholeBricks := calcWholeBricksInDim(input.Dimension, coSizeForFullBrick)
 	remainder := calcRemainderFromDim(input.Dimension, coSizeForFullBrick)
-
 	result := calcResult(remainder, wholeBricks, coSizeForHalfBrick, coSizeForFullBrick)
-
 	fullCos := calcCoPlusAndMinus(result.fullCo, input.Joint)
 	halfCos := calcCoPlusAndMinus(result.halfCo, input.Joint)
+
+	verticalCoSize := calcCoSize(input.Height, input.Joint)
+	courses := calcWholeBricksInDim(input.Dimension, verticalCoSize)
+	coursesRemainder := calcRemainderFromDim(input.Dimension, verticalCoSize)
+
+	verticalResult := calcVerticalResult(remainder, courses, verticalCoSize)
+	vCos1 := calcCoPlusAndMinus(verticalResult.firstCo, input.Joint)
+	vCos2 := calcCoPlusAndMinus(verticalResult.secondCo, input.Joint)
+
+	fmt.Printf("%+v", verticalResult)
 
 	pageVariables := pageVariables{
 		PageTitle:   "Rosibrix v2.0",
@@ -94,6 +121,18 @@ func handleResult(w http.ResponseWriter, r *http.Request) {
 		HalfCo:      halfCos.co,
 		HalfCoPlus:  halfCos.coPlus,
 		HalfCoMinus: halfCos.coMinus,
+		VerticalResult: true,
+		Courses:     courses,
+		CoursesRemainder: coursesRemainder,
+		NfirstVertical:  verticalResult.nfirst,
+		NsecondVertical: verticalResult.nsecond,
+		FirstVCo: vCos1.co,
+		FirstVCoPlus: vCos1.coPlus,
+		FirstVCoMinus: vCos1.coMinus,
+		SecondVCo: vCos2.co,
+		SecondVCoPlus: vCos2.coPlus,
+		SecondVCoMinus: vCos2.coMinus,
+		
 	}
 
 	renderPage(w, "brix.html", pageVariables)

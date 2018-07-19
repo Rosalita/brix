@@ -3,14 +3,18 @@ body {
   background-color: #d3d3d3;
 }
 
+
 h1 {
   color:#6d6d6d;
   font-family: 'Nunito', sans-serif;
 }
+
+
 h3 {
-  color:#6d6d6d;
+  color:#d3d3d3;
   font-family: 'Nunito', sans-serif;
 }
+
 p {
   color:#4f4f4f;
   font-family: 'Nunito', sans-serif;
@@ -31,7 +35,8 @@ input[type=submit] {
 }
 
 .table  {
-  border-collapse:collapse;border-spacing:0;
+  border-collapse:collapse;
+  border-spacing:0;
 }
 
 .table td{
@@ -68,6 +73,11 @@ input[type=submit] {
 .table .col2{
   font-family: 'Nunito', sans-serif;
   font-size:14px;
-  vertical-align:top
+  vertical-align:top;
   background-color:#ffffff;
+}
+
+.test {
+  background-color:  #f8f8f8;
+  color: #4b5786;
 }
