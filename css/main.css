@@ -9,7 +9,6 @@ h1 {
   font-family: 'Nunito', sans-serif;
 }
 
-
 h3 {
   color:#d3d3d3;
   font-family: 'Nunito', sans-serif;
@@ -47,7 +46,7 @@ input[type=submit] {
   border-width:1px;
   overflow:hidden;
   word-break:normal;
-  background-color:#eeeeee;
+  background-color:#ffffff;
 }
 
 .table th{
@@ -74,10 +73,5 @@ input[type=submit] {
   font-family: 'Nunito', sans-serif;
   font-size:14px;
   vertical-align:top;
-  background-color:#ffffff;
-}
-
-.test {
-  background-color:  #f8f8f8;
-  color: #4b5786;
+  background-color:#eeeeee;
 }
