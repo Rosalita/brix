@@ -82,8 +82,8 @@ func calcHorizontalResult(remainder float64, wholeBricks int, coSizeForHalfBrick
 			result.halfCo = calcHalfCo(wholeBricks, coSizeForFullBrick, coSizeForHalfBrick)
 			return result
 		}
-		result.nfull = wholeBricks
-		result.fullCo = calcWholeCo(wholeBricks, coSizeForFullBrick)
+		result.nfull = wholeBricks +1
+		result.fullCo = calcWholeCo(wholeBricks +1, coSizeForFullBrick)
 		result.nhalf = float64(wholeBricks) + 0.5
 		result.halfCo = calcHalfCo(wholeBricks, coSizeForFullBrick, coSizeForHalfBrick)
 		return result
@@ -97,7 +97,7 @@ func calcHorizontalResult(remainder float64, wholeBricks int, coSizeForHalfBrick
 		return result
 	}
 	result.nfull = wholeBricks + 1
-	result.fullCo = calcWholeCo(wholeBricks+1, coSizeForFullBrick)
+	result.fullCo = calcWholeCo(wholeBricks +1, coSizeForFullBrick)
 	result.nhalf = float64(wholeBricks) + 0.5
 	result.halfCo = calcHalfCo(wholeBricks, coSizeForFullBrick, coSizeForHalfBrick)
 	return result
