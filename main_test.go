@@ -8,14 +8,6 @@ import (
 	"net/url"
 )
 
-func TestParseFloatLogsSuccess(t *testing.T) {
-	var buffer bytes.Buffer
-	log.SetOutput(&buffer)
-	handleFloatParsingErrors("1.2")
-	logMessage := buffer.String()
-	assert.Contains(t, logMessage, "successfully parsed float", "unexpected log message")
-}
-
 func TestParseFloatLogsSFailure(t *testing.T) {
 	var buffer bytes.Buffer
 	log.SetOutput(&buffer)
@@ -38,5 +30,4 @@ func TestCanMarshallFormValues(t *testing.T){
 	assert.Equal(t, float64(65), input.Height, "unexpected value for height marshalled from form")
 	assert.Equal(t, float64(10), input.Joint, "unexpected value for joint marshalled from form")
 	assert.Equal(t, float64(3400), input.Dimension, "unexpected value for dimension marshalled from form")
-
 }

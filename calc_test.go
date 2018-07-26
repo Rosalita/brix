@@ -2,7 +2,6 @@ package main
 
 import (
 	"testing"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -57,7 +56,6 @@ func TestCalcRemainderFromDim(t *testing.T) {
 }
 
 func TestCalcWholeCo(t *testing.T) {
-
 	var tests = []struct {
 		numBricks int
 		coSize    float64
@@ -74,7 +72,6 @@ func TestCalcWholeCo(t *testing.T) {
 }
 
 func TestCalcHalfCo(t *testing.T) {
-
 	var tests = []struct {
 		wholeBricks        int
 		coSizeForFullBrick float64
@@ -104,7 +101,6 @@ func TestCanCalcHalfBrickSize(t *testing.T) {
 		halfBrick := calcHalfBrickSize(test.length, test.joint)
 		assert.Equal(t, test.halfBrickSize, halfBrick, "unexpected halfbrick size for length: %.2f joint: %.2f", test.length, test.joint)
 	}
-
 }
 
 func TestCanCalcCoPlusAndMinus(t *testing.T) {
@@ -120,39 +116,37 @@ func TestCanCalcCoPlusAndMinus(t *testing.T) {
 	}
 	for _, test := range tests {
 		cos := calcCoPlusAndMinus(test.co, test.joint)
-		assert.Equal(t, test.co, cos.co, "unexpected CO calculated")
-		assert.Equal(t, test.coPlus, cos.coPlus, "unexpected CO+ calculated")
-		assert.Equal(t, test.coMinus, cos.coMinus, "unexpected CO- calculated")
+		assert.Equal(t, test.co, cos.basic, "unexpected CO calculated")
+		assert.Equal(t, test.coPlus, cos.plus, "unexpected CO+ calculated")
+		assert.Equal(t, test.coMinus, cos.minus, "unexpected CO- calculated")
 	}
 }
 
 func TestCanCalcResult(t *testing.T) {
-
 	var tests = []struct {
 		remainder           float64
 		wholeBricks         int
 		coSizeForHalfBrick  float64
 		coSizeForWholeBrick float64
-		result              result
-	
+		result              horizontalResult
 	}{
-		{25, 15, 112.5, 225, result{fullCo: 3375,halfCo: 3487.5, nfull: 15, nhalf: 15.5}},
-		{215, 0, 112.5, 225, result{fullCo: 0, halfCo: 112.5, nfull: 0, nhalf: 0.5}},
-		{0, 1, 112.5, 225, result{fullCo: 225, halfCo: 0, nfull: 1, nhalf: 0}},
-		{112.5, 1, 112.5, 225, result{fullCo: 0, halfCo: 337.5, nfull :0, nhalf: 1.5}},
-		{25, 0, 112.5, 225, result{fullCo: 0, halfCo: 112.5, nfull: 0, nhalf: 0.5}},
+		{25, 15, 112.5, 225, horizontalResult{fullCo: 3375, halfCo: 3487.5, nfull: 15, nhalf: 15.5}},
+		{215, 0, 112.5, 225, horizontalResult{fullCo: 0, halfCo: 112.5, nfull: 0, nhalf: 0.5}},
+		{0, 1, 112.5, 225, horizontalResult{fullCo: 225, halfCo: 0, nfull: 1, nhalf: 0}},
+		{112.5, 1, 112.5, 225, horizontalResult{fullCo: 0, halfCo: 337.5, nfull: 0, nhalf: 1.5}},
+		{25, 0, 112.5, 225, horizontalResult{fullCo: 0, halfCo: 112.5, nfull: 0, nhalf: 0.5}},
 	}
 	for _, test := range tests {
-		result := calcResult(test.remainder, test.wholeBricks, test.coSizeForHalfBrick, test.coSizeForWholeBrick)
-		assert.Equal(t, test.result, result, "unexpected result for remainder: %.2f wholeBricks: %d", test.remainder, test.wholeBricks )
+		result := calcHorizontalResult(test.remainder, test.wholeBricks, test.coSizeForHalfBrick, test.coSizeForWholeBrick)
+		assert.Equal(t, test.result, result, "unexpected result for remainder: %.2f wholeBricks: %d", test.remainder, test.wholeBricks)
 	}
 }
 
-func TestIsAFullCo(t *testing.T){
+func TestIsAFullCo(t *testing.T) {
 	var tests = []struct {
-		remainder  float64
-		wholeBricks   int
-		isAFullCo  bool
+		remainder   float64
+		wholeBricks int
+		isAFullCo   bool
 	}{
 		{25, 15, false},
 		{0, 15, true},
@@ -163,14 +157,13 @@ func TestIsAFullCo(t *testing.T){
 		result := isAFullCo(test.remainder, test.wholeBricks)
 		assert.Equal(t, test.isAFullCo, result, "unexpected isAFullCo property for remainder: %.2f wholeBricks: %d", test.remainder, test.wholeBricks)
 	}
-	
 }
 
-func TestIsAHalfCo(t *testing.T){
+func TestIsAHalfCo(t *testing.T) {
 	var tests = []struct {
-		remainder  float64
+		remainder          float64
 		coSizeForHalfBrick float64
-		isAHalfCo  bool
+		isAHalfCo          bool
 	}{
 		{25, 112.5, false},
 		{115, 112.5, false},
@@ -182,10 +175,10 @@ func TestIsAHalfCo(t *testing.T){
 	}
 }
 
-func TestIsLessThanHalfACo(t *testing.T){
+func TestIsLessThanHalfACo(t *testing.T) {
 	var tests = []struct {
-		wholeBricks int
-		remainder  float64
+		wholeBricks        int
+		remainder          float64
 		coSizeForHalfBrick float64
 		isLessThanHalfACo  bool
 	}{
@@ -196,25 +189,25 @@ func TestIsLessThanHalfACo(t *testing.T){
 		{1, 100, 100, false},
 		{1, 101, 100, false},
 		{1, 0, 112.5, false},
-
 	}
 	for _, test := range tests {
-		result := isLessThanHalfACo(test.wholeBricks, test.remainder,  test.coSizeForHalfBrick)
+		result := isLessThanHalfACo(test.wholeBricks, test.remainder, test.coSizeForHalfBrick)
 		assert.Equal(t, test.isLessThanHalfACo, result, "unexpected isLessThanHalfACo property for remainder: %.2f wholebricks: %d coSizeHalfBrick: %.2f", test.remainder, test.wholeBricks, test.coSizeForHalfBrick)
 	}
 }
 
-func TestCalcVerticalResult(t *testing.T){
+func TestCalcVerticalResult(t *testing.T) {
 	var tests = []struct {
-		remainder  float64
-		courses int
+		remainder      float64
+		courses        int
 		verticalCoSize float64
-		result  verticalResult
+		result         verticalResult
 	}{
 		{25, 1, 75, verticalResult{nfirst: 1, firstCo: 75, nsecond: 2, secondCo: 150}},
 		{25, 0, 75, verticalResult{nfirst: 0, firstCo: 0, nsecond: 1, secondCo: 75}},
 		{0, 1, 75, verticalResult{nfirst: 1, firstCo: 75, nsecond: 0, secondCo: 0}},
 		{0, 0, 75, verticalResult{nfirst: 0, firstCo: 0, nsecond: 1, secondCo: 75}},
+		{0, 5, 75, verticalResult{nfirst: 5, firstCo: 375, nsecond: 0, secondCo: 0}},
 	}
 	for _, test := range tests {
 		result := calcVerticalResult(test.remainder, test.courses, test.verticalCoSize)

@@ -8,6 +8,7 @@ import (
 	"strconv"
 )
 
+// Userinput holds the input given by the user
 type Userinput struct {
 	Dimension float64
 	Length    float64
@@ -16,19 +17,22 @@ type Userinput struct {
 	Joint     float64
 }
 
-type Cos struct {
-	co      float64
-	coPlus  float64
-	coMinus float64
+// Coordination holds a trio of CO, CO+ and CO- values
+type Coordination struct {
+	basic float64
+	plus  float64
+	minus float64
 }
 
-type result struct {
+// horizontalResult stores the nearest horizontal coordinating sizes to the dimension
+type horizontalResult struct {
 	nfull  int
 	fullCo float64
 	nhalf  float64
 	halfCo float64
 }
 
+// verticalResult stores the nearest vertical course sizes to the dimension
 type verticalResult struct {
 	nfirst   int
 	firstCo  float64
@@ -36,6 +40,7 @@ type verticalResult struct {
 	secondCo float64
 }
 
+// pageVariable are the values displayed by the html template
 type pageVariables struct {
 	PageTitle        string
 	Dimension        float64
@@ -89,32 +94,32 @@ func handleResult(w http.ResponseWriter, r *http.Request) {
 	coSizeForHalfBrick := calcCoSize(calcHalfBrickSize(input.Length, input.Joint), input.Joint)
 	wholeBricks := calcWholeBricksInDim(input.Dimension, coSizeForFullBrick)
 	remainder := calcRemainderFromDim(input.Dimension, coSizeForFullBrick)
-	result := calcResult(remainder, wholeBricks, coSizeForHalfBrick, coSizeForFullBrick)
-	fmt.Printf("%+v\n", result)
+	result := calcHorizontalResult(remainder, wholeBricks, coSizeForHalfBrick, coSizeForFullBrick)
 
-	fullCos, halfCos, vCos1, vCos2 := Cos{}, Cos{}, Cos{}, Cos{}
+	fullCo, halfCo, firstVertCo, secondVertCo := Coordination{}, Coordination{}, Coordination{}, Coordination{}
 
 	if result.nfull != 0 {
-		fullCos = calcCoPlusAndMinus(result.fullCo, input.Joint)
+		fullCo = calcCoPlusAndMinus(result.fullCo, input.Joint)
 	}
 
 	if result.nhalf != 0 {
-		halfCos = calcCoPlusAndMinus(result.halfCo, input.Joint)
+		halfCo = calcCoPlusAndMinus(result.halfCo, input.Joint)
 	}
 
 	verticalCoSize := calcCoSize(input.Height, input.Joint)
 	courses := calcWholeBricksInDim(input.Dimension, verticalCoSize)
 	coursesRemainder := calcRemainderFromDim(input.Dimension, verticalCoSize)
-
-	verticalResult := calcVerticalResult(remainder, courses, verticalCoSize)
+	verticalResult := calcVerticalResult(coursesRemainder, courses, verticalCoSize)
 
 	if verticalResult.nfirst != 0 {
-		vCos1 = calcCoPlusAndMinus(verticalResult.firstCo, input.Joint)
+		firstVertCo = calcCoPlusAndMinus(verticalResult.firstCo, input.Joint)
 	}
 
 	if verticalResult.nsecond != 0 {
-		vCos2 = calcCoPlusAndMinus(verticalResult.secondCo, input.Joint)
+		secondVertCo = calcCoPlusAndMinus(verticalResult.secondCo, input.Joint)
 	}
+
+	fmt.Printf("%+v\n", verticalResult)
 
 	pageVariables := pageVariables{
 		PageTitle:        "Rosibrix v2.0",
@@ -127,24 +132,24 @@ func handleResult(w http.ResponseWriter, r *http.Request) {
 		WholeBricks:      wholeBricks,
 		Remainder:        remainder,
 		Nfull:            result.nfull,
-		FullCo:           fullCos.co,
-		FullCoPlus:       fullCos.coPlus,
-		FullCoMinus:      fullCos.coMinus,
+		FullCo:           fullCo.basic,
+		FullCoPlus:       fullCo.plus,
+		FullCoMinus:      fullCo.minus,
 		Nhalf:            result.nhalf,
-		HalfCo:           halfCos.co,
-		HalfCoPlus:       halfCos.coPlus,
-		HalfCoMinus:      halfCos.coMinus,
+		HalfCo:           halfCo.basic,
+		HalfCoPlus:       halfCo.plus,
+		HalfCoMinus:      halfCo.minus,
 		VerticalResult:   true,
 		Courses:          courses,
 		CoursesRemainder: coursesRemainder,
 		NfirstVertical:   verticalResult.nfirst,
 		NsecondVertical:  verticalResult.nsecond,
-		FirstVCo:         vCos1.co,
-		FirstVCoPlus:     vCos1.coPlus,
-		FirstVCoMinus:    vCos1.coMinus,
-		SecondVCo:        vCos2.co,
-		SecondVCoPlus:    vCos2.coPlus,
-		SecondVCoMinus:   vCos2.coMinus,
+		FirstVCo:         firstVertCo.basic,
+		FirstVCoPlus:     firstVertCo.plus,
+		FirstVCoMinus:    firstVertCo.minus,
+		SecondVCo:        secondVertCo.basic,
+		SecondVCoPlus:    secondVertCo.plus,
+		SecondVCoMinus:   secondVertCo.minus,
 	}
 
 	renderPage(w, "brix.html", pageVariables)
@@ -174,8 +179,6 @@ func handleFloatParsingErrors(value string) float64 {
 	if err != nil {
 		log.Print("error parsing float", err)
 		return 0
-	} else {
-		log.Printf("successfully parsed float %f", f)
-		return f
-	}
+	} 
+	return f
 }
