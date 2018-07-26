@@ -4,8 +4,6 @@ import (
 	"math"
 )
 
-
-
 func calcWholeBricksInDim(dimension float64, coSize float64) int {
 	return int(dimension / coSize)
 }
@@ -51,51 +49,54 @@ func isLessThanHalfACo(wholeBricks int, remainder float64, coSizeForHalfBrick fl
 	return remainder >= 0 && !isAFullCo(remainder, wholeBricks) && remainder < coSizeForHalfBrick
 }
 
-
 func calcResult(remainder float64, wholeBricks int, coSizeForHalfBrick float64, coSizeForFullBrick float64) result {
 	result := result{}
-	
+
 	if isAFullCo(remainder, wholeBricks) {
 		result.nfull = wholeBricks
 		result.fullCo = calcWholeCo(wholeBricks, coSizeForFullBrick)
+		return result
 	}
+
 	if isAHalfCo(remainder, coSizeForHalfBrick) {
 		result.nhalf = float64(wholeBricks) + 0.5
 		result.halfCo = calcHalfCo(wholeBricks, coSizeForFullBrick, coSizeForHalfBrick)
+		return result
 	}
+
 	if wholeBricks == 0 {
 		if isLessThanHalfACo(wholeBricks, remainder, coSizeForHalfBrick) {
 			result.fullCo = float64(0)
 			result.nhalf = float64(0.5)
 			result.halfCo = calcHalfCo(wholeBricks, coSizeForFullBrick, coSizeForHalfBrick)
-		} else {
-			result.nfull = wholeBricks
-			result.fullCo = calcWholeCo(wholeBricks, coSizeForFullBrick)
-			result.nhalf = float64(wholeBricks) + 0.5
-			result.halfCo = calcHalfCo(wholeBricks, coSizeForFullBrick, coSizeForHalfBrick)
+			return result
 		}
-	} else {
-		if isLessThanHalfACo(wholeBricks, remainder, coSizeForHalfBrick) {
-			result.nfull = wholeBricks
-			result.fullCo = calcWholeCo(wholeBricks, coSizeForFullBrick)
-			result.nhalf = float64(wholeBricks) + 0.5
-			result.halfCo = calcHalfCo(wholeBricks, coSizeForFullBrick, coSizeForHalfBrick)
-		} else {
-			result.nfull = wholeBricks + 1
-			result.fullCo = calcWholeCo(wholeBricks+1, coSizeForFullBrick)
-			result.nhalf = float64(wholeBricks) + 0.5
-			result.halfCo = calcHalfCo(wholeBricks, coSizeForFullBrick, coSizeForHalfBrick)
-		}
+		result.nfull = wholeBricks
+		result.fullCo = calcWholeCo(wholeBricks, coSizeForFullBrick)
+		result.nhalf = float64(wholeBricks) + 0.5
+		result.halfCo = calcHalfCo(wholeBricks, coSizeForFullBrick, coSizeForHalfBrick)
+		return result
 	}
+
+	if isLessThanHalfACo(wholeBricks, remainder, coSizeForHalfBrick) {
+		result.nfull = wholeBricks
+		result.fullCo = calcWholeCo(wholeBricks, coSizeForFullBrick)
+		result.nhalf = float64(wholeBricks) + 0.5
+		result.halfCo = calcHalfCo(wholeBricks, coSizeForFullBrick, coSizeForHalfBrick)
+		return result
+	}
+	result.nfull = wholeBricks + 1
+	result.fullCo = calcWholeCo(wholeBricks+1, coSizeForFullBrick)
+	result.nhalf = float64(wholeBricks) + 0.5
+	result.halfCo = calcHalfCo(wholeBricks, coSizeForFullBrick, coSizeForHalfBrick)
 	return result
 }
 
-
-func calcVerticalResult(remainder float64, courses int, verticalCoSize float64) verticalResult{
+func calcVerticalResult(remainder float64, courses int, verticalCoSize float64) verticalResult {
 	result := verticalResult{}
 	if courses == 0 && remainder > 0 {
 		result.nfirst = courses
-		result.firstCo = float64(courses + 1) * verticalCoSize
+		result.firstCo = float64(courses+1) * verticalCoSize
 	}
 	if isAFullCo(remainder, courses) {
 		result.nfirst = courses
@@ -104,7 +105,7 @@ func calcVerticalResult(remainder float64, courses int, verticalCoSize float64) 
 		result.nfirst = courses
 		result.firstCo = float64(courses) * verticalCoSize
 		result.nsecond = courses + 1
-		result.secondCo = float64(courses + 1) * verticalCoSize
+		result.secondCo = float64(courses+1) * verticalCoSize
 	}
 	return result
 }

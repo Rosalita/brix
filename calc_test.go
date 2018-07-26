@@ -138,8 +138,8 @@ func TestCanCalcResult(t *testing.T) {
 	}{
 		{25, 15, 112.5, 225, result{fullCo: 3375,halfCo: 3487.5, nfull: 15, nhalf: 15.5}},
 		{215, 0, 112.5, 225, result{fullCo: 0, halfCo: 112.5, nfull: 0, nhalf: 0.5}},
-		{0, 1, 112.5, 225, result{fullCo: 450, halfCo: 337.5, nfull: 2, nhalf: 1.5}},
-		{112.5, 1, 112.5, 225, result{fullCo: 450, halfCo: 337.5, nfull :2, nhalf: 1.5}},
+		{0, 1, 112.5, 225, result{fullCo: 225, halfCo: 0, nfull: 1, nhalf: 0}},
+		{112.5, 1, 112.5, 225, result{fullCo: 0, halfCo: 337.5, nfull :0, nhalf: 1.5}},
 		{25, 0, 112.5, 225, result{fullCo: 0, halfCo: 112.5, nfull: 0, nhalf: 0.5}},
 	}
 	for _, test := range tests {

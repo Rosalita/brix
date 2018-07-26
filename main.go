@@ -23,48 +23,48 @@ type Cos struct {
 }
 
 type result struct {
-	nfull int
+	nfull  int
 	fullCo float64
-	nhalf float64
+	nhalf  float64
 	halfCo float64
 }
 
 type verticalResult struct {
-	nfirst  int
-	firstCo float64
-	nsecond int
+	nfirst   int
+	firstCo  float64
+	nsecond  int
 	secondCo float64
 }
 
 type pageVariables struct {
-	PageTitle   string
-	Dimension   float64
-	Length      float64
-	Width       float64
-	Height      float64
-	Joint       float64
-	Result			bool
-	WholeBricks int
-	Remainder   float64
-	Nfull       int
-	FullCo      float64
-	FullCoPlus  float64
-	FullCoMinus float64
-	Nhalf       float64
-	HalfCo      float64
-	HalfCoPlus  float64
-	HalfCoMinus float64
-	VerticalResult bool
-	Courses     int
+	PageTitle        string
+	Dimension        float64
+	Length           float64
+	Width            float64
+	Height           float64
+	Joint            float64
+	Result           bool
+	WholeBricks      int
+	Remainder        float64
+	Nfull            int
+	FullCo           float64
+	FullCoPlus       float64
+	FullCoMinus      float64
+	Nhalf            float64
+	HalfCo           float64
+	HalfCoPlus       float64
+	HalfCoMinus      float64
+	VerticalResult   bool
+	Courses          int
 	CoursesRemainder float64
-	NfirstVertical  int
-	NsecondVertical int
-	FirstVCo    float64
-	FirstVCoPlus float64
-	FirstVCoMinus float64
-	SecondVCo   float64
-	SecondVCoPlus float64
-	SecondVCoMinus float64
+	NfirstVertical   int
+	NsecondVertical  int
+	FirstVCo         float64
+	FirstVCoPlus     float64
+	FirstVCoMinus    float64
+	SecondVCo        float64
+	SecondVCoPlus    float64
+	SecondVCoMinus   float64
 }
 
 func main() {
@@ -90,49 +90,61 @@ func handleResult(w http.ResponseWriter, r *http.Request) {
 	wholeBricks := calcWholeBricksInDim(input.Dimension, coSizeForFullBrick)
 	remainder := calcRemainderFromDim(input.Dimension, coSizeForFullBrick)
 	result := calcResult(remainder, wholeBricks, coSizeForHalfBrick, coSizeForFullBrick)
-	fullCos := calcCoPlusAndMinus(result.fullCo, input.Joint)
-	halfCos := calcCoPlusAndMinus(result.halfCo, input.Joint)
+	fmt.Printf("%+v\n", result)
+
+	fullCos, halfCos, vCos1, vCos2 := Cos{}, Cos{}, Cos{}, Cos{}
+
+	if result.nfull != 0 {
+		fullCos = calcCoPlusAndMinus(result.fullCo, input.Joint)
+	}
+
+	if result.nhalf != 0 {
+		halfCos = calcCoPlusAndMinus(result.halfCo, input.Joint)
+	}
 
 	verticalCoSize := calcCoSize(input.Height, input.Joint)
 	courses := calcWholeBricksInDim(input.Dimension, verticalCoSize)
 	coursesRemainder := calcRemainderFromDim(input.Dimension, verticalCoSize)
 
 	verticalResult := calcVerticalResult(remainder, courses, verticalCoSize)
-	vCos1 := calcCoPlusAndMinus(verticalResult.firstCo, input.Joint)
-	vCos2 := calcCoPlusAndMinus(verticalResult.secondCo, input.Joint)
 
-	fmt.Printf("%+v", verticalResult)
+	if verticalResult.nfirst != 0 {
+		vCos1 = calcCoPlusAndMinus(verticalResult.firstCo, input.Joint)
+	}
+
+	if verticalResult.nsecond != 0 {
+		vCos2 = calcCoPlusAndMinus(verticalResult.secondCo, input.Joint)
+	}
 
 	pageVariables := pageVariables{
-		PageTitle:   "Rosibrix v2.0",
-		Dimension:   input.Dimension,
-		Length:      input.Length,
-		Width:       input.Width,
-		Height:      input.Height,
-		Joint:       input.Joint,
-		Result:      true,
-		WholeBricks: wholeBricks,
-		Remainder:   remainder,
-		Nfull:        result.nfull,
-		FullCo:      fullCos.co,
-		FullCoPlus:  fullCos.coPlus,
-		FullCoMinus: fullCos.coMinus,
-		Nhalf:       result.nhalf,
-		HalfCo:      halfCos.co,
-		HalfCoPlus:  halfCos.coPlus,
-		HalfCoMinus: halfCos.coMinus,
-		VerticalResult: true,
-		Courses:     courses,
+		PageTitle:        "Rosibrix v2.0",
+		Dimension:        input.Dimension,
+		Length:           input.Length,
+		Width:            input.Width,
+		Height:           input.Height,
+		Joint:            input.Joint,
+		Result:           true,
+		WholeBricks:      wholeBricks,
+		Remainder:        remainder,
+		Nfull:            result.nfull,
+		FullCo:           fullCos.co,
+		FullCoPlus:       fullCos.coPlus,
+		FullCoMinus:      fullCos.coMinus,
+		Nhalf:            result.nhalf,
+		HalfCo:           halfCos.co,
+		HalfCoPlus:       halfCos.coPlus,
+		HalfCoMinus:      halfCos.coMinus,
+		VerticalResult:   true,
+		Courses:          courses,
 		CoursesRemainder: coursesRemainder,
-		NfirstVertical:  verticalResult.nfirst,
-		NsecondVertical: verticalResult.nsecond,
-		FirstVCo: vCos1.co,
-		FirstVCoPlus: vCos1.coPlus,
-		FirstVCoMinus: vCos1.coMinus,
-		SecondVCo: vCos2.co,
-		SecondVCoPlus: vCos2.coPlus,
-		SecondVCoMinus: vCos2.coMinus,
-		
+		NfirstVertical:   verticalResult.nfirst,
+		NsecondVertical:  verticalResult.nsecond,
+		FirstVCo:         vCos1.co,
+		FirstVCoPlus:     vCos1.coPlus,
+		FirstVCoMinus:    vCos1.coMinus,
+		SecondVCo:        vCos2.co,
+		SecondVCoPlus:    vCos2.coPlus,
+		SecondVCoMinus:   vCos2.coMinus,
 	}
 
 	renderPage(w, "brix.html", pageVariables)

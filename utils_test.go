@@ -67,16 +67,4 @@ func TestExecuteTemplateLogsFailure(t *testing.T){
 	assert.Equal(t, 200, responseRecorder.Code)
 	assert.Contains(t, logMessage, "template executing error template: test: \"test\" is an incomplete or empty template", "unexpected log message")
 }
-
-func TestExecuteTemplateLogsSuccess(t *testing.T){
-	templ := parseTemplate("testdata/validTemplate.html")
-	vars := pageVariables{PageTitle: "test title"}
-	var buffer bytes.Buffer
-	log.SetOutput(&buffer)
-	responseRecorder := httptest.NewRecorder()
-	executeTemplate(templ, responseRecorder, vars)
-	logMessage := buffer.String()
-	assert.Equal(t, 200, responseRecorder.Code)
-	assert.Contains(t, logMessage, "successfully executed template", "unexpected log message")
 	
-}

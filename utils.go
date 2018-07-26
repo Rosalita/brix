@@ -33,7 +33,5 @@ func executeTemplate(t *template.Template, w http.ResponseWriter, v pageVariable
 	err := t.Execute(w, v)
 	if err != nil {
 		log.Print("template executing error ", err)
-	} else{
-		log.Printf("successfully executed template")
 	}
 }

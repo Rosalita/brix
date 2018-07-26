@@ -34,9 +34,9 @@
 
   <p>Whole bricks in dimension: {{.WholeBricks}} Remainder: {{.Remainder}}mm</p>
 
-  {{if gt .WholeBricks 0}}
+  {{if ne .Nfull 0}}
 
-  <table class="table" style="float: left">
+  <table class="table" {{if ne .Nhalf 0.0}} style="float: left"{{end}}>
       <tr>
         <th class="col1" rowspan="3">Co-ordinating sizes for {{.Nfull}} bricks</th>
         <th class="col2">co +</th>
@@ -51,8 +51,11 @@
         <td class="col2">{{.FullCoMinus}}</td>
       </tr>
     </table>
+    <img style="float:left" src="/img/10x10.png">
   {{end}}
-<img style="float:left" src="/img/10x10.png">
+
+{{if ne .Nhalf 0.0}}
+
   <table class="table">
       <tr>
         <th class="col1" rowspan="3">Co-ordinating sizes for {{.Nhalf}} bricks</th>
@@ -69,13 +72,14 @@
       </tr>
     </table>
 
+{{end}}
   {{end}}
- 
+
   {{if .VerticalResult}}
   <hr>
   <p>Vertical courses in dimension: {{.Courses}} Remainder {{.CoursesRemainder}}mm</p>
 
- {{if gt .NfirstVertical 0}}
+ {{if ne .NfirstVertical 0}}
 
  <table class="table" style="float: left">
      <tr>
@@ -92,9 +96,10 @@
        <td class="col2">{{.FirstVCoMinus}}</td>
      </tr>
    </table>
+   <img style="float:left" src="/img/10x10.png">
  {{end}}
- <img style="float:left" src="/img/10x10.png">
 
+ {{if ne .NsecondVertical 0}}
  <table class="table">
   <tr>
     <th class="col1" rowspan="3">Vertical Co-ordinating sizes for {{.NsecondVertical}} bricks</th>
@@ -110,6 +115,7 @@
     <td class="col2">{{.SecondVCoMinus}}</td>
   </tr>
 </table>
+{{end}}
 {{end}}
 
 </body>
