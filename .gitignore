@@ -1,2 +1,11 @@
+# Compiled Source #
+###################
+
+*.exe
+brix
+
+# Test Output #
+###############
+
 cover.html
 cover.out
